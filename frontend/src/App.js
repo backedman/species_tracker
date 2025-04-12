@@ -1,6 +1,6 @@
 import Container from 'react-bootstrap/Container';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Home from './pages/Home,js';
+import Home from './pages/Home.js';
 import Profile from './pages/Profile.js'
 
 export default function App(){
@@ -10,6 +10,7 @@ export default function App(){
         <Routes>
           <Route path = "/" element = {<Home/>}/>
           <Route path = "/profile" element = {<Profile/>}/>
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </BrowserRouter>
     </Container>
