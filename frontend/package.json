@@ -7,9 +7,13 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
+    "bootstrap": "^5.3.5",
     "react": "^19.1.0",
+    "react-bootstrap": "^2.10.9",
     "react-dom": "^19.1.0",
-    "react-scripts": "5.0.1",
+    "react-router-dom": "^7.5.0",
+    "react-scripts": "^5.0.1",
+    "serve": "^14.2.4",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -36,5 +40,6 @@
       "last 1 safari version"
     ]
   },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
+  "proxy": "http://localhost:5000"
 }
