@@ -7,7 +7,7 @@ import NavbarBrand from 'react-bootstrap/esm/NavbarBrand';
 export default function Header() {
   return (
     <Navbar sticky = "top"> 
-      <Container className = "justify-content-start">
+      <Container className = "justify-content-start ms-3">
         <NavbarBrand><strong>Species Tracker</strong></NavbarBrand>
         <Nav>Discover</Nav>
         <Form className = "d-flex">

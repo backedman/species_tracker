@@ -5,7 +5,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  background-color: ivory;
+  background-color: cornsilk;
 }
 
 .container-fluid {
@@ -13,23 +13,25 @@ body {
 }
 
 .container {
-  margin-left: 1rem;
+  margin: 0px;
 }
 
 input[type = "submit"] {
-  background-color: yellowgreen;
-  border-color: yellowgreen;
-}
-
-input[type = "submit"]:hover {
   background-color: olivedrab;
   border-color: olivedrab;
 }
 
-.navbar {
-  background-color: lightyellow;
+input[type = "submit"]:hover {
+  background-color: darkolivegreen;
+  border-color: darkolivegreen;
+}
 
-  border-bottom: solid 0.25rem palegoldenrod;
+.navbar {
+  background-color: yellowgreen;
+
+  border-bottom: solid 0.5rem olivedrab;
+
+  margin-bottom: 1.5rem;
 }
 
 .test {

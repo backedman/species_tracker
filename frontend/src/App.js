@@ -9,7 +9,7 @@ export default function App(){
       <BrowserRouter>
         <Routes>
           <Route path = "/" element = {<Profile/>}/>
-          <Route path = "/profile" element = {<Profile/>}/>
+          <Route path = "/profile/:taxa" element = {<Profile/>}/>
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </BrowserRouter>
