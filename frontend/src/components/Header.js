@@ -6,13 +6,13 @@ import NavbarBrand from 'react-bootstrap/esm/NavbarBrand';
 
 export default function Header() {
   return (
-    <Navbar sticky = "top" class = "navbar Header">
+    <Navbar sticky = "top"> 
       <Container className = "justify-content-start">
         <NavbarBrand><strong>Species Tracker</strong></NavbarBrand>
         <Nav>Discover</Nav>
         <Form className = "d-flex">
           <Form.Control type = "text" placeholder = "Lookup by Taxa" className = "ms-3 me-2 col-sm-10"/>
-          <input class="btn btn-primary" type="submit" value="Submit"/>
+          <input className ="btn btn-primary" type="submit" value="Submit"/>
         </Form>
       </Container>
     </Navbar>

@@ -8,7 +8,7 @@ export default function App(){
     <Container fluid>
       <BrowserRouter>
         <Routes>
-          <Route path = "/" element = {<Home/>}/>
+          <Route path = "/" element = {<Profile/>}/>
           <Route path = "/profile" element = {<Profile/>}/>
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

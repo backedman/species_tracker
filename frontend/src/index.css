@@ -8,6 +8,14 @@ body {
   background-color: ivory;
 }
 
+.container-fluid {
+  padding: 0px;
+}
+
+.container {
+  margin-left: 1rem;
+}
+
 input[type = "submit"] {
   background-color: yellowgreen;
   border-color: yellowgreen;
@@ -18,8 +26,12 @@ input[type = "submit"]:hover {
   border-color: olivedrab;
 }
 
-.Header {
+.navbar {
   background-color: lightyellow;
 
   border-bottom: solid 0.25rem palegoldenrod;
+}
+
+.test {
+  background-color: red;
 }
