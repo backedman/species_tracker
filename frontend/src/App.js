@@ -1,7 +1,17 @@
-import Header from './components/Header';
+import Container from 'react-bootstrap/Container';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import Home from './pages/Home,js';
+import Profile from './pages/Profile.js'
 
-export default function App() {
+export default function App(){
   return (
-    <Header />
+    <Container fluid>
+      <BrowserRouter>
+        <Routes>
+          <Route path = "/" element = {<Home/>}/>
+          <Route path = "/profile" element = {<Profile/>}/>
+        </Routes>
+      </BrowserRouter>
+    </Container>
   );
 }

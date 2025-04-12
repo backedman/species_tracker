@@ -4,6 +4,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  background-color: ivory;
 }
 
 input[type = "submit"] {
@@ -14,4 +16,10 @@ input[type = "submit"] {
 input[type = "submit"]:hover {
   background-color: olivedrab;
   border-color: olivedrab;
+}
+
+.Header {
+  background-color: lightyellow;
+
+  border-bottom: solid 0.25rem palegoldenrod;
 }
