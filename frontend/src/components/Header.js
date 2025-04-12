@@ -9,9 +9,10 @@ export default function Header() {
     <Navbar sticky = "top"> 
       <Container className = "justify-content-start ms-3">
         <NavbarBrand><strong>Species Tracker</strong></NavbarBrand>
-        <Nav>Discover</Nav>
+        <Nav.Link href = "/" className = "ms-3">Home</Nav.Link>
+        <Nav.Link className = "ms-4">All Taxa</Nav.Link>
         <Form className = "d-flex">
-          <Form.Control type = "text" placeholder = "Lookup by Taxa" className = "ms-3 me-2 col-sm-10"/>
+          <Form.Control type = "text" placeholder = "Lookup by Taxa" className = "ms-4 me-2 col-sm-10"/>
           <input className ="btn btn-primary" type="submit" value="Submit"/>
         </Form>
       </Container>

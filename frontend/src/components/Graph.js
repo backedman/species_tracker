@@ -1,5 +1,5 @@
 
-export default function Summary(){
+export default function Graphs(){
     return (
         <p>WIP</p>
     );
