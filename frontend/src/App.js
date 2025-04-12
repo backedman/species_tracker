@@ -1,13 +1,7 @@
-import React, {useState, useEffect} from 'react';
-import './App.css';
+import Header from './components/Header';
 
-function App() {
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-      </header>
-    </div>
+    <Header />
   );
 }
-
-export default App;
