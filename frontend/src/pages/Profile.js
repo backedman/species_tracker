@@ -11,24 +11,12 @@ export default function Profile() {
   const { taxa } = useParams();
 
   return (
-    <Container fluid className="px-4 py-3">
+    <Container fluid>
       <Header />
-
-      <section className="my-4">
-        <BasicInfo taxonId={taxa} />
-      </section>
-
-      <section className="my-4">
-        <Map taxonId={taxa} />
-      </section>
-
-      <section className="my-4">
-        <Graph />
-      </section>
-
-      <section className="my-4">
-        <Summary />
-      </section>
+      <BasicInfo taxonId={taxa} />
+      <Map taxonId={taxa} />
+      <Graph />
+      <Summary />
     </Container>
   );
 }
