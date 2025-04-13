@@ -81,3 +81,7 @@ def info(taxon_id):
 @app.route('/map/<taxon_id>')
 def map_dist(taxon_id):
     pass
+
+@app.route('/population/<taxon_id>')
+def pop_project(taxon_id):
+    pass
