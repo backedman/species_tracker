@@ -5,13 +5,13 @@ import Map from '../components/Map.js';
 import Graphs from '../components/Graphs.js';
 import Summary from '../components/Summary.js';
 
-export default function App() {
+export default function Profile() {
   const { taxa } = useParams();
 
   return (
     <>
       <Header/>
-      <BasicInfo/>
+      <BasicInfo taxonId={taxa} />
       <p>test</p>
     </>
   );
