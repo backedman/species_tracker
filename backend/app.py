@@ -1,7 +1,14 @@
-from flask import Flask,jsonify
+from flask import Flask,jsonify,Response
 import requests
 import json
 import pandas as pd
+import numpy as np
+import plotly.graph_objects as go
+from statsmodels.nonparametric.smoothers_lowess import lowess
+from scipy.interpolate import PchipInterpolator
+from scipy.optimize import curve_fit
+
+
 
 app = Flask(__name__)
 df = pd.read_csv('data/filtered_species_with_conservation_status.csv')
@@ -73,7 +80,7 @@ def info(taxon_id):
         species = ob['results'][0]['name']
         wikipedia_url = ob['results'][0]['wikipedia_url']
         status = ob['results'][0].get("conservation_status", "Safe")
-        status = "Threatened" if status is not "Safe" else "Safe"
+        status = "Threatened" if status != "Safe" else "Safe"
         print(status)
         print("here3")
         return jsonify({'name': name, 
@@ -194,7 +201,97 @@ def map_dist(taxon_id):
         print('here')
         return m.get_root().render()
 
-
 @app.route('/graph/<taxon_id>')
-def pop_project(taxon_id):
-    pass    
+def graph(taxon_id):
+
+    TAXON_FILTER = taxon_id
+
+    # Read the CSV and cast taxon_id as int
+    df = pd.read_csv("data/taxon_grid_clusters_by_year.csv")
+    df["taxon_id"] = df["taxon_id"].astype(float).astype(int)
+
+    taxon_id = int(taxon_id)
+    taxon_df = df[df["taxon_id"] == taxon_id]
+
+    filtered_df = taxon_df
+
+    # Step 1: Aggregate & interpolate population
+    yearly_population = filtered_df.groupby("year")["cluster_count"].sum().reset_index()
+    yearly_population.rename(columns={"cluster_count": "population"}, inplace=True)
+    full_years = pd.DataFrame({"year": range(yearly_population["year"].min(), 2031)})
+    merged = full_years.merge(yearly_population, on="year", how="left")
+    merged["interpolated"] = merged["population"].isna()
+    merged["population"] = merged["population"].interpolate(method="linear")
+
+    # Step 2: LOWESS smoothing
+    x_obs = merged.loc[merged["year"] <= 2020, "year"]
+    y_obs = merged.loc[merged["year"] <= 2020, "population"]
+    lowess_result = lowess(endog=y_obs, exog=x_obs, frac=0.3, return_sorted=False)
+
+    # Step 3: Forecasting using slope decay
+    x_arr = x_obs.values
+    y_arr = lowess_result
+    recent_slopes = np.diff(y_arr[-4:]) / np.diff(x_arr[-4:])
+    avg_slope = np.mean(recent_slopes)
+
+    forecast_years = np.arange(2021, 2031)
+    decay = np.linspace(1.0, 0.2, len(forecast_years))
+    forecast_values = [y_arr[-1] + avg_slope * decay[0]]
+    for i in range(1, len(forecast_years)):
+        next_val = forecast_values[-1] + avg_slope * decay[i]
+        forecast_values.append(max(next_val, 0))
+
+    forecast_years = np.concatenate([[2020], forecast_years])
+    forecast_values = np.concatenate([[y_arr[-1]], forecast_values])
+
+    # Step 4: Plot with Plotly
+    fig = go.Figure()
+
+    y_obs = merged.loc[merged["year"] <= 2020, "population"].round().astype(int)
+
+    # Original data points
+    fig.add_trace(go.Scatter(
+        x=x_obs,
+        y=y_obs,
+        mode="markers",
+        marker=dict(color="black"),
+        name="Data"
+    ))
+
+    # Smoothed + forecast line
+    fig.add_trace(go.Scatter(
+        x=np.concatenate([x_arr, forecast_years[1:]]),
+        y=np.concatenate([y_arr, forecast_values[1:]]),
+        mode="lines",
+        line=dict(color="red", dash="dash"),
+        name="Prediction Line"
+    ))
+
+    # Interpolated 2021–2024 points
+    missing_years = np.arange(2021, 2025)
+    missing_values = np.interp(missing_years, forecast_years, forecast_values)
+    missing_values = np.round(missing_values).astype(int)
+    fig.add_trace(go.Scatter(
+        x=missing_years,
+        y=missing_values,
+        mode="markers",
+        marker=dict(color="black", symbol="circle"),
+        name="Data"
+    ))
+
+    # Layout & interactivity
+    fig.update_layout(
+        title=f"Population Forecast with Interpolated 2021–2024 Transition (Taxon {TAXON_FILTER})",
+        xaxis_title="Year",
+        yaxis_title="Total Population",
+        template="plotly_white",
+        hovermode="x unified",
+        legend=dict(x=0.01, y=0.99),
+    )
+
+    # Show in notebook or browser
+    return Response(fig.to_html(full_html=True, include_plotlyjs='cdn'), mimetype="text/html")
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
