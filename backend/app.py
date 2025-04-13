@@ -213,6 +213,11 @@ def graph(taxon_id):
     taxon_id = int(taxon_id)
     taxon_df = df[df["taxon_id"] == taxon_id]
 
+    taxon_df = taxon_df[taxon_df["year"] != 2025]
+
+    max_year = taxon_df["year"].max()
+    min_year = taxon_df["year"].min()
+
     filtered_df = taxon_df
 
     # Step 1: Aggregate & interpolate population
@@ -224,8 +229,8 @@ def graph(taxon_id):
     merged["population"] = merged["population"].interpolate(method="linear")
 
     # Step 2: LOWESS smoothing
-    x_obs = merged.loc[merged["year"] <= 2020, "year"]
-    y_obs = merged.loc[merged["year"] <= 2020, "population"]
+    x_obs = merged.loc[merged["year"] <= max_year, "year"]
+    y_obs = merged.loc[merged["year"] <= max_year, "population"]
     lowess_result = lowess(endog=y_obs, exog=x_obs, frac=0.3, return_sorted=False)
 
     # Step 3: Forecasting using slope decay
@@ -234,20 +239,20 @@ def graph(taxon_id):
     recent_slopes = np.diff(y_arr[-4:]) / np.diff(x_arr[-4:])
     avg_slope = np.mean(recent_slopes)
 
-    forecast_years = np.arange(2021, 2031)
+    forecast_years = np.arange(max_year+1, 2031)
     decay = np.linspace(1.0, 0.2, len(forecast_years))
     forecast_values = [y_arr[-1] + avg_slope * decay[0]]
     for i in range(1, len(forecast_years)):
         next_val = forecast_values[-1] + avg_slope * decay[i]
         forecast_values.append(max(next_val, 0))
 
-    forecast_years = np.concatenate([[2020], forecast_years])
+    forecast_years = np.concatenate([[max_year], forecast_years])
     forecast_values = np.concatenate([[y_arr[-1]], forecast_values])
 
     # Step 4: Plot with Plotly
     fig = go.Figure()
 
-    y_obs = merged.loc[merged["year"] <= 2020, "population"].round().astype(int)
+    y_obs = merged.loc[merged["year"] <= max_year, "population"].round().astype(int)
 
     # Original data points
     fig.add_trace(go.Scatter(
@@ -268,7 +273,7 @@ def graph(taxon_id):
     ))
 
     # Interpolated 2021–2024 points
-    missing_years = np.arange(2021, 2025)
+    missing_years = np.arange(max_year, 2025)
     missing_values = np.interp(missing_years, forecast_years, forecast_values)
     missing_values = np.round(missing_values).astype(int)
     fig.add_trace(go.Scatter(

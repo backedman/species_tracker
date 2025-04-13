@@ -23,7 +23,7 @@ export default function Profile() {
       </section>
 
       <section className="my-4">
-        <Graph />
+        <Graph taxonId={taxa} />
       </section>
 
       <section className="my-4">
