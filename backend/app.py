@@ -23,7 +23,7 @@ for a in ob['results']:
         name = a['preferred_common_name']
         id = a['id']
         # df = pd.read_csv('filtered_species_with_conservation_status.csv')
-        taxon_dict[id] = name
+        taxon_dict[id] = name.lower()
 
 
 
@@ -41,7 +41,7 @@ def animal_search():
     query = request.args.get("query", "").lower()
     return jsonify(suggest_species(query))
 
-def suggest_species(query, max_results=10):
+def suggest_species(query, max_results=5):
     matches = [
         {"taxon_id": taxon_id, "name": name}
         for taxon_id, name in taxon_dict.items()

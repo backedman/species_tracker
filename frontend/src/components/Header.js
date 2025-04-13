@@ -1,16 +1,35 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Navbar, Container, NavbarBrand, Form, Nav } from 'react-bootstrap';
+import { Navbar, Container, NavbarBrand, Form, Nav, ListGroup } from 'react-bootstrap';
 
 export default function Header() {
   const [taxa, setTaxa] = useState('');
   const navigate = useNavigate();
+  const [suggestions, setSuggestions] = useState([]);
 
   const handleSubmit = (e) => {
     e.preventDefault(); // Prevent page reload
     if (taxa.trim()) {
       navigate(`/profile/${taxa}`);
     }
+  };
+
+  useEffect(() => {
+    if (taxa.length > 1) {
+    
+      fetch(`/animal?query=${taxa}`)
+        .then(res => res.json())
+        .then(data => {
+            console.log("Suggestions fetched:", data);
+            setSuggestions(data)});
+    } else {
+      setSuggestions([]);
+    }
+  }, [taxa]);
+
+  const handleSuggestionClick = (id) => {
+    setTaxa("" + id);
+    setSuggestions([]);
   };
 
   return (
@@ -26,7 +45,17 @@ export default function Header() {
             className="ms-4 me-2 col-sm-10"
             value={taxa}
             onChange={(e) => setTaxa(e.target.value)}
+            autoComplete="off"
           />
+          {suggestions.length > 0 && (
+                <ListGroup className="suggestions-box w-100 mt-2">
+                    {suggestions.map((s, i) => (
+                    <ListGroup.Item key={i} action onClick={() => handleSuggestionClick(s.taxon_id)}>
+                        {s.name}
+                    </ListGroup.Item>
+                    ))}
+                </ListGroup>
+              )}
           <input className="btn btn-primary" type="submit" value="Submit" />
         </Form>
       </Container>
