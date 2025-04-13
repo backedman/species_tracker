@@ -59,6 +59,12 @@ export default function BasicInfo({ taxonId }) {
           <strong>Class:</strong> {info.genus}<br/>
           <strong>Species:</strong> <em>{info.species}</em><br/>
           <strong>Wikipedia Link:</strong> <a href = {info.wikipedia_url}>{info.wikipedia_url}</a>
+          <p>
+            <strong>Current Status:</strong>{' '}
+            <span className={info.status === 'Threatened' ? 'text-danger' : 'text-success'}>
+              <strong>{info.status}</strong>
+            </span>
+          </p>
         </p>
       </Container>
     </Container>

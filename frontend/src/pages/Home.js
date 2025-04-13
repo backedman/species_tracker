@@ -40,8 +40,10 @@ export default function Home(){
     return (
         <Container fluid className = "d-flex flex-column justify-content-center align-items-center my-5">
             <h1>Species Tracker</h1>
-            <p>Track the location of a species and predict the future data/likelihood of it tending towards extinction!</p>
+            <p>Track the range of a species and see future population trend predictions!</p>
             <Form className = "d-flex flex-row justify-content-center" onSubmit={handleSubmit}>
+
+                <div className="d-flex flex-column position-relative" style={{ width: '300px' }}>
                 <Form.Control
                     type = "text"
                     placeholder = "Lookup by Taxa"
@@ -51,7 +53,7 @@ export default function Home(){
                     autoComplete="off"
                 />
                 {suggestions.length > 0 && (
-                    <ListGroup className="suggestions-box w-100 mt-2">
+                    <ListGroup className="suggestions-box position-absolute w-100 mt-10" style={{ top: '100%', marginTop: '4px' }}>
                         {suggestions.map((s, i) => (
                         <ListGroup.Item key={i} action onClick={() => handleSuggestionClick(s.taxon_id)}>
                             {s.name}
@@ -59,7 +61,9 @@ export default function Home(){
                         ))}
                     </ListGroup>
                 )}
-                <input className = "btn btn-primary" type="submit" value="Submit"/>
+                </div>
+
+                <input className = "btn btn-primary ms-2" type="submit" value="Submit"/>
             </Form>
             <a href = "/list" className = "mt-2 mb-2">List of All Taxa</a>
             <Discovery/>
