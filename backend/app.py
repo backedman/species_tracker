@@ -208,3 +208,8 @@ def map_dist(taxon_id):
 @app.route('/population/<taxon_id>')
 def pop_project(taxon_id):
     pass
+
+# gets 5 random endangered species to display on the front page
+@app.route('/random')
+def randomize():
+    pass
