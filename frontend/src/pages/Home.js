@@ -63,7 +63,7 @@ export default function Home(){
                 )}
                 </div>
 
-                <input className = "btn btn-primary" type="submit" value="Submit"/>
+                <input className = "btn btn-primary ms-2" type="submit" value="Submit"/>
             </Form>
             <HighestRisk/>
         </Container>
