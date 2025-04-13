@@ -1,5 +1,10 @@
 .venv
 __pycache__
+*.csv
+.ipynb_checkpoints
+.vscode
+*.pkl
+*.tar.gz
 
 # dependencies
 /node_modules
