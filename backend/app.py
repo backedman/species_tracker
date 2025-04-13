@@ -35,3 +35,7 @@ def get_img(taxon_id):
         return jsonify({'image_url': image_url})
     except (KeyError, IndexError):
         return jsonify({'error': 'Image not available for this taxon'}), 404
+
+@app.route('/info/<taxon_id>')
+def info(taxon_id):
+    
