@@ -39,6 +39,8 @@ export default function Header() {
         <Nav.Link href = "/" className = "ms-3">Home</Nav.Link>
         <Nav.Link className = "ms-4">All Taxa</Nav.Link>
         <Form className="d-flex" onSubmit={handleSubmit}>
+
+        <div className="d-flex flex-column position-relative" style={{ width: '300px' }}>
           <Form.Control
             type="text"
             placeholder="Lookup by Taxa"
@@ -48,15 +50,16 @@ export default function Header() {
             autoComplete="off"
           />
           {suggestions.length > 0 && (
-                <ListGroup className="suggestions-box w-100 mt-2">
+                <ListGroup className="suggestions-box position-absolute w-50 mt-10" style={{ top: '100%', marginTop: '4px' }}>
                     {suggestions.map((s, i) => (
                     <ListGroup.Item key={i} action onClick={() => handleSuggestionClick(s.taxon_id)}>
-                        {s.name}
-                    </ListGroup.Item>
-                    ))}
+                      {s.name}
+                  </ListGroup.Item>
+                  ))}
                 </ListGroup>
               )}
-          <input className="btn btn-primary" type="submit" value="Submit" />
+            </div>
+          <input className="btn btn-primary ms-4" type="submit" value="Submit" />
         </Form>
       </Container>
     </Navbar>
