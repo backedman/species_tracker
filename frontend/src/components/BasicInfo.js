@@ -26,7 +26,7 @@ export default function BasicInfo({ taxonId }) {
   }, [taxonId]);
 
   return (
-    <Container className="d-flex content align-items-center">
+    <Container className="d-flex">
       {imageUrl && (
         <Image
           id="image"
@@ -37,9 +37,12 @@ export default function BasicInfo({ taxonId }) {
           className="ms-3"
         />
       )}
-      <p id="description" className="ms-4">
-        {error ? error : 'INSERT PROFILE TEXT HERE'}
-      </p>
+      <Container>
+        <h3 className = "ms-4">Taxa Name</h3>
+        <p id = "description" className = "ms-4">
+            INSERT PROFILE TEXT HERE
+        </p>
+      </Container>
     </Container>
   );
 }

@@ -17,7 +17,7 @@ export default function Home(){
     return (
         <Container fluid className = "d-flex flex-column justify-content-center align-items-center my-5">
             <h1>Species Tracker</h1>
-            <p>Track the location of a species and predict the future data/liklihood of it tending towards extinction!</p>
+            <p>Track the location of a species and predict the future data/likelihood of it tending towards extinction!</p>
             <Form className = "d-flex flex-row justify-content-center" onSubmit={handleSubmit}>
                 <Form.Control
                     type = "text"
