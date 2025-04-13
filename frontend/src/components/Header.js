@@ -23,7 +23,7 @@ export default function Header() {
           <Form.Control
             type="text"
             placeholder="Lookup by Taxa"
-            className="ms-3 me-2 col-sm-10"
+            className="ms-4 me-2 col-sm-10"
             value={taxa}
             onChange={(e) => setTaxa(e.target.value)}
           />
