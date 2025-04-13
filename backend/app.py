@@ -58,6 +58,8 @@ def info(taxon_id):
     response = requests.get(url)
     ob = response.json()
 
+    print("random")
+
    # Handle unexpected responses
     if response.status_code != 200 or 'results' not in ob:
         return jsonify({'error': 'API request failed or malformed response'}), 500
@@ -70,8 +72,13 @@ def info(taxon_id):
         genus = ob['results'][0]['iconic_taxon_name']
         species = ob['results'][0]['name']
         wikipedia_url = ob['results'][0]['wikipedia_url']
+        status = ob['results'][0].get("conservation_status", "Safe")
+        status = "Threatened" if status is not "Safe" else "Safe"
+        print(status)
+        print("here3")
         return jsonify({'name': name, 
                         'genus': genus,
+                        'status' : status,
                         'species': species,
                         'wikipedia_url': wikipedia_url})
     except (KeyError, IndexError):
@@ -188,6 +195,6 @@ def map_dist(taxon_id):
         return m.get_root().render()
 
 
-@app.route('/population/<taxon_id>')
+@app.route('/graph/<taxon_id>')
 def pop_project(taxon_id):
-    pass
+    pass    
