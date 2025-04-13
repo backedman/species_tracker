@@ -15,7 +15,7 @@ export default function Profile() {
       <Header />
       <BasicInfo taxonId={taxa} />
       <Map taxonId={taxa} />
-      <Graph />
+      <Graph taxonId={taxa}/>
       <Summary />
     </Container>
   );
