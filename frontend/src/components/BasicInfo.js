@@ -58,7 +58,7 @@ export default function BasicInfo({ taxonId }) {
         <p id = "description" className = "ms-4">
           <strong>Class:</strong> {info.genus}<br/>
           <strong>Species:</strong> <em>{info.species}</em><br/>
-          <strong>Wikipedia Link:</strong> {info.wikipedia_link}<br/>
+          <strong>Wikipedia Link:</strong> <a href = {info.wikipedia_url}>{info.wikipedia_url}</a>
         </p>
       </Container>
     </Container>
