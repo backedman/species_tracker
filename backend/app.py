@@ -25,6 +25,9 @@ for a in ob['results']:
         # df = pd.read_csv('filtered_species_with_conservation_status.csv')
         taxon_dict[id] = name.lower()
 
+sorted_taxa = sorted(taxon_dict.items(), key=lambda item: item[1].lower())
+
+
 
 
 
@@ -96,7 +99,6 @@ def info(taxon_id):
     
 @app.route('/all_taxa')
 def all_taxa():
-    sorted_taxa = sorted(taxon_dict.items(), key=lambda item: item[1].lower())  # Sort by species name
     return jsonify([{"name": name, "taxon_id": taxon_id} for taxon_id, name in sorted_taxa])
     
 
