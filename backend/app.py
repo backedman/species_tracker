@@ -1,4 +1,5 @@
 from flask import Flask,jsonify,Response
+from flask_cors import CORS
 import requests
 import json
 import pandas as pd
@@ -7,12 +8,18 @@ import plotly.graph_objects as go
 from statsmodels.nonparametric.smoothers_lowess import lowess
 from scipy.interpolate import PchipInterpolator
 from scipy.optimize import curve_fit
+from itertools import combinations
+from geopy.distance import geodesic
+import joblib
 
 
 
 app = Flask(__name__)
 df = pd.read_csv('data/filtered_species_with_conservation_status.csv')
+CORS(app)  # This will allow all origins by default
 taxon_dict = dict(zip(df['taxon_id'], df['name']))
+taxon_info = {}
+
 
 
 
@@ -81,6 +88,13 @@ def info(taxon_id):
         wikipedia_url = ob['results'][0]['wikipedia_url']
         status = ob['results'][0].get("conservation_status", "Safe")
         status = "Threatened" if status != "Safe" else "Safe"
+        
+        taxon_info[taxon_id] = {'name': name, 
+                        'genus': genus,
+                        'status' : status,
+                        'species': species,
+                        'wikipedia_url': wikipedia_url}
+
         print(status)
         print("here3")
         return jsonify({'name': name, 
@@ -317,6 +331,191 @@ def graph(taxon_id):
 
     # Show in notebook or browser
     return Response(fig.to_html(full_html=True, include_plotlyjs='cdn'), mimetype="text/html")
+
+@app.route('/prediction/<taxon_id>')
+def extinction_prediction(taxon_id):
+
+    
+    # Read the CSV and cast taxon_id as int
+    df = pd.read_csv("data/taxon_grid_clusters_by_year.csv")
+    df["taxon_id"] = df["taxon_id"].astype(float).astype(int)
+
+    taxon_id = int(taxon_id)
+    taxon_df = df[df["taxon_id"] == taxon_id]
+
+    taxon_df = taxon_df[taxon_df["year"] != 2025]
+
+    max_year = taxon_df["year"].max()
+    min_year = taxon_df["year"].min()
+
+    filtered_df = taxon_df
+
+    # Step 1: Aggregate & interpolate population
+    yearly_population = filtered_df.groupby("year")["cluster_count"].sum().reset_index()
+    yearly_population.rename(columns={"cluster_count": "population"}, inplace=True)
+    full_years = pd.DataFrame({"year": range(yearly_population["year"].min(), 2031)})
+    merged = full_years.merge(yearly_population, on="year", how="left")
+    merged["interpolated"] = merged["population"].isna()
+    merged["population"] = merged["population"].interpolate(method="linear")
+
+    # Step 2: LOWESS smoothing
+    x_obs = merged.loc[merged["year"] <= max_year, "year"]
+    y_obs = merged.loc[merged["year"] <= max_year, "population"]
+    lowess_result = lowess(endog=y_obs, exog=x_obs, frac=0.3, return_sorted=False)
+
+    # Step 3: Forecasting using slope decay
+    x_arr = x_obs.values
+    y_arr = lowess_result
+    recent_slopes = np.diff(y_arr[-4:]) / np.diff(x_arr[-4:])
+    avg_slope = np.mean(recent_slopes)
+
+    forecast_years = np.arange(max_year+1, 2036)
+    decay = np.linspace(1.0, 0.2, len(forecast_years))
+    forecast_values = [y_arr[-1] + avg_slope * decay[0]]
+    for i in range(1, len(forecast_years)):
+        next_val = forecast_values[-1] + avg_slope * decay[i]
+        forecast_values.append(max(next_val, 0))
+
+    forecast_years = np.concatenate([[max_year], forecast_years])
+    forecast_values = np.concatenate([[y_arr[-1]], forecast_values])
+
+    # Step 4: Plot with Plotly
+    fig = go.Figure()
+
+    y_obs = merged.loc[merged["year"] <= max_year, "population"].round().astype(int)
+
+    # Original data points
+    fig.add_trace(go.Scatter(
+        x=x_obs,
+        y=y_obs,
+        mode="markers",
+        marker=dict(color="black"),
+        name="Data"
+    ))
+
+    # Combine observed + forecasted values up to 2024 for the blue line
+    cutoff_year = 2025
+    combined_years = np.concatenate([x_obs, forecast_years[forecast_years >= cutoff_year]])
+    combined_values = np.concatenate([y_obs, forecast_values[forecast_years >= cutoff_year]])
+
+    # Sort combined by year to ensure proper line plotting
+    sort_idx = np.argsort(combined_years)
+    combined_years = combined_years[sort_idx]
+    combined_values = combined_values[sort_idx]
+
+    
+
+    # Final smoothed population series
+    pop_series = pd.Series(combined_values, index=combined_years)
+    pop_series = pop_series.sort_index()
+
+    # Rolling window features
+    pop2034 = pop_series.get(2034, np.nan)
+    pop2033 = pop_series.get(2033, np.nan)
+    avg2_10yr = np.nanmean([pop2033, pop2034])
+
+    pop2029 = pop_series.get(2029, np.nan)
+    pop2028 = pop_series.get(2029, np.nan)
+    avg2_5yr = np.nanmean([pop2029, pop2028])
+
+    avg5_10yr = pop_series.loc[2030:2034].mean() if all(y in pop_series for y in range(2030, 2034)) else np.nan
+    avg10_10yr = pop_series.loc[2025:2034].mean() if all(y in pop_series for y in range(2025, 2034)) else np.nan
+
+    avg5_5yr = pop_series.loc[2025:2029].mean() if all(y in pop_series for y in range(2030, 2034)) else np.nan
+    avg10_5yr = pop_series.loc[2020:2029].mean() if all(y in pop_series for y in range(2025, 2034)) else np.nan
+
+    # Get 2025 cluster info
+    print(taxon_df)
+    curr_clusters_df = taxon_df[
+        (taxon_df["taxon_id"] == taxon_id) & (taxon_df["year"] == 2024)
+    ]
+
+    curr_clusters = curr_clusters_df.shape[0]
+
+    coords = list(zip(curr_clusters_df["centroid_lat"], curr_clusters_df["centroid_lon"]))
+
+    if len(coords) >= 2:
+        distances = [geodesic(p1, p2).km for p1, p2 in combinations(coords, 2)]
+        avg_dist_clusters = np.mean(distances)
+        max_dist_clusters = np.max(distances)
+    else:
+        avg_dist_clusters = 0.0
+        max_dist_clusters = 0.0
+
+    features = []
+
+    features.append({
+        "taxon_id": taxon_id,
+        "ancestry": taxon_info[str(taxon_id)]['genus'] != "Mammalia",
+        "curr_pop": pop2034,
+        "avg2": avg2_10yr,
+        "avg5": avg5_10yr,
+        "avg10": avg10_10yr,
+        "curr_clusters": curr_clusters,
+        "avg_dist_clusters": avg_dist_clusters,
+        "max_dist_clusters": max_dist_clusters
+    })
+
+    features.append({
+        "taxon_id": taxon_id,
+        "ancestry": taxon_info[str(taxon_id)]['genus'] != "Mammalia",
+        "curr_pop": pop2029,
+        "avg2": avg2_5yr,
+        "avg5": avg5_5yr,
+        "avg10": avg10_5yr,
+        "curr_clusters": curr_clusters,
+        "avg_dist_clusters": avg_dist_clusters,
+        "max_dist_clusters": max_dist_clusters
+    })
+
+    # Combine to final DataFrame
+    regression_features_df = pd.DataFrame(features)
+
+    #classification model
+
+    # Step 1: Load the bundle
+    bundle = joblib.load("data/svm_model_bundle.joblib")
+    model = bundle["model"]
+    scaler = bundle["scaler"]
+    threshold = bundle["threshold"]
+    features = bundle["features"]
+
+    # Detach ancestry
+    ancestry_col = regression_features_df["ancestry"]
+    features_wo_ancestry = regression_features_df.drop(columns=["ancestry", "taxon_id"])
+
+    # Scale the remaining features
+    X_scaled = scaler.transform(features_wo_ancestry)
+
+    # Reattach ancestry as the last column
+    X_scaled_df = pd.DataFrame(X_scaled, columns=features_wo_ancestry.columns, index=regression_features_df.index)
+    X_scaled_df["ancestry"] = ancestry_col
+    threshold = 0.28
+
+    X_scaled_df = X_scaled_df[features]
+
+    # Get 5-year predictions
+    probs_5yr = model.predict_proba(X_scaled_df.iloc[[1]])
+    pred_5yr = (probs_5yr[:, 1] >= threshold).astype(int)
+    confidence_5yr = np.where(pred_5yr == 1, probs_5yr[:, 1], probs_5yr[:, 0])
+
+    # Get 10-year predictions
+    probs_10yr = model.predict_proba(X_scaled_df.iloc[[0]])
+    pred_10yr = (probs_10yr[:, 1] >= threshold).astype(int)
+    confidence_10yr = np.where(pred_10yr == 1, probs_10yr[:, 1], probs_10yr[:, 0])
+
+    # Create results dataframe
+    results_df = pd.DataFrame({
+        "confidence_5yr": confidence_5yr,
+        "pred_5yr": pred_5yr,
+        "confidence_10yr": confidence_10yr,
+        "pred_10yr": pred_10yr
+    })
+
+    print(results_df)
+
+    return jsonify(results_df.to_dict(orient="records")), 200
+
 
 
 if __name__ == '__main__':
