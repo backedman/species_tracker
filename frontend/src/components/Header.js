@@ -17,7 +17,8 @@ export default function Header() {
     <Navbar sticky="top">
       <Container className="justify-content-start ms-3">
         <NavbarBrand><strong>Species Tracker</strong></NavbarBrand>
-        <Nav>Discover</Nav>
+        <Nav.Link href = "/" className = "ms-3">Home</Nav.Link>
+        <Nav.Link className = "ms-4">All Taxa</Nav.Link>
         <Form className="d-flex" onSubmit={handleSubmit}>
           <Form.Control
             type="text"
