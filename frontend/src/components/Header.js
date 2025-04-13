@@ -50,7 +50,7 @@ export default function Header() {
             autoComplete="off"
           />
           {suggestions.length > 0 && (
-                <ListGroup className="suggestions-box position-absolute w-50 mt-10" style={{ top: '100%', marginTop: '4px' }}>
+                <ListGroup className="suggestions-box position-absolute w-50 mt-10 ms-4" style={{ top: '100%', marginTop: '4px' }}>
                     {suggestions.map((s, i) => (
                     <ListGroup.Item key={i} action onClick={() => handleSuggestionClick(s.taxon_id)}>
                       {s.name}
