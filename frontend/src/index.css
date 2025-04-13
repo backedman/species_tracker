@@ -39,6 +39,10 @@ input[type = "submit"]:active:focus {
   margin-bottom: 1.5rem;
 }
 
+.header {
+  margin-left: 2rem;
+}
+
 .test {
   background-color: red;
 }

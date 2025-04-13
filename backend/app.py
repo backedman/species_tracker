@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 from flask import Flask,jsonify,Response
 from flask_cors import CORS
+=======
+from flask import Flask,jsonify,request,Response
+>>>>>>> origin/integrate-backend
 import requests
 import json
 import pandas as pd
@@ -15,10 +19,35 @@ import joblib
 
 
 app = Flask(__name__)
+<<<<<<< HEAD
 df = pd.read_csv('data/filtered_species_with_conservation_status.csv')
 CORS(app)  # This will allow all origins by default
 taxon_dict = dict(zip(df['taxon_id'], df['name']))
 taxon_info = {}
+=======
+# url = f'https://api.inaturalist.org/v1/taxa?order=desc&order_by=observations_count'
+# response = requests.get(url)
+# ob = response.json()
+# for i in range(0, ob['results'].length()):
+#     name = ob['results'][i]['preferred_common_name']
+#     id = ob['results'][i]['id']
+#     # df = pd.read_csv('filtered_species_with_conservation_status.csv')
+#     taxon_dict = dict(zip(id, name))
+url = f'https://api.inaturalist.org/v1/taxa?taxon_id=3%2C40151&rank_level=10&per_page=20000&order=desc&order_by=observations_count'
+response = requests.get(url)
+ob = response.json()
+print (ob['results'])
+taxon_dict = dict()
+for a in ob['results']:
+    classname = a['iconic_taxon_id']
+    if(classname and (classname == 40151 or classname == 3)):
+        name = a['preferred_common_name']
+        id = a['id']
+        # df = pd.read_csv('filtered_species_with_conservation_status.csv')
+        taxon_dict[id] = name.lower()
+
+sorted_taxa = sorted(taxon_dict.items(), key=lambda item: item[1].lower())
+>>>>>>> origin/integrate-backend
 
 
 
@@ -32,17 +61,16 @@ def hello():
 
 
 #TODO: main function to run the code to get the information we need. We can use auxillary functions, but this function returns all the information the animal page will use including the data.
-@app.route('/animal/<animal_name>')
-
-def animal_search(animal_name):
-    suggest_species(animal_name)
+@app.route('/animal')
+def animal_search():
+    query = request.args.get("query", "").lower()
+    return jsonify(suggest_species(query))
 
 def suggest_species(query, max_results=5):
-    query = query.lower()
     matches = [
-        {"name": name, "taxon_id": taxon_id}
-        for name, taxon_id in taxon_dict.items()
-        if query in name.lower()
+        {"taxon_id": taxon_id, "name": name}
+        for taxon_id, name in taxon_dict.items()
+        if query in name
     ]
     return matches[:max_results]
 
@@ -104,6 +132,10 @@ def info(taxon_id):
                         'wikipedia_url': wikipedia_url})
     except (KeyError, IndexError):
         return jsonify({'error': 'Info not available for this taxon'}), 404
+    
+@app.route('/all_taxa')
+def all_taxa():
+    return jsonify([{"name": name, "taxon_id": taxon_id} for taxon_id, name in sorted_taxa])
     
 
 @app.route('/map/<taxon_id>')
