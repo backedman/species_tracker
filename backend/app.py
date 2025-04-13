@@ -1,6 +1,7 @@
 from flask import Flask,jsonify,request,Response
 import requests
 import json
+import random
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
@@ -330,4 +331,6 @@ def pop_project(taxon_id):
 # gets 5 random endangered species to display on the front page
 @app.route('/random')
 def randomize():
-    pass
+    i = random.randint(0, len(sorted_taxa) - 1)
+
+    return jsonify({"id": sorted_taxa[i][0]})
