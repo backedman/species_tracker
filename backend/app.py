@@ -4,6 +4,9 @@ import json
 
 app = Flask(__name__)
 
+taxon_data = None
+with open('data/')
+
 
 #TODO: direct to search page
 @app.route('/')
@@ -38,4 +41,3 @@ def get_img(taxon_id):
 
 @app.route('/info/<taxon_id>')
 def info(taxon_id):
-    
