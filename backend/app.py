@@ -239,7 +239,7 @@ def graph(taxon_id):
     recent_slopes = np.diff(y_arr[-4:]) / np.diff(x_arr[-4:])
     avg_slope = np.mean(recent_slopes)
 
-    forecast_years = np.arange(max_year+1, 2031)
+    forecast_years = np.arange(max_year+1, 2035)
     decay = np.linspace(1.0, 0.2, len(forecast_years))
     forecast_values = [y_arr[-1] + avg_slope * decay[0]]
     for i in range(1, len(forecast_years)):
@@ -263,13 +263,33 @@ def graph(taxon_id):
         name="Data"
     ))
 
-    # Smoothed + forecast line
+    # Combine observed + forecasted values up to 2024 for the blue line
+    cutoff_year = 2025
+    combined_years = np.concatenate([x_obs, forecast_years[forecast_years < cutoff_year]])
+    combined_values = np.concatenate([y_obs, forecast_values[forecast_years < cutoff_year]])
+
+    # Sort combined by year to ensure proper line plotting
+    sort_idx = np.argsort(combined_years)
+    combined_years = combined_years[sort_idx]
+    combined_values = combined_values[sort_idx]
+
+    # Blue line: all data + smoothed values up to 2024
     fig.add_trace(go.Scatter(
-        x=np.concatenate([x_arr, forecast_years[1:]]),
-        y=np.concatenate([y_arr, forecast_values[1:]]),
+        x=combined_years,
+        y=combined_values,
         mode="lines",
-        line=dict(color="red", dash="dash"),
-        name="Prediction Line"
+        line=dict(color="blue", dash="solid"),
+        name="Smoothed Trend (to 2024)"
+    ))
+
+    # Orange line: 2024 onwards (keep 2024 in both to maintain continuity)
+    split_index = np.searchsorted(forecast_years, 2025)
+    fig.add_trace(go.Scatter(
+        x=forecast_years[split_index - 1:],  # include 2024 to connect lines smoothly
+        y=forecast_values[split_index - 1:],
+        mode="lines",
+        line=dict(color="orange", dash="dash"),
+        name="Forecast (2025+)"
     ))
 
     # Interpolated 2021–2024 points
@@ -281,7 +301,7 @@ def graph(taxon_id):
         y=missing_values,
         mode="markers",
         marker=dict(color="black", symbol="circle"),
-        name="Data"
+        name="Interpolated (2021–2024)"
     ))
 
     # Layout & interactivity
@@ -293,6 +313,7 @@ def graph(taxon_id):
         hovermode="x unified",
         legend=dict(x=0.01, y=0.99),
     )
+
 
     # Show in notebook or browser
     return Response(fig.to_html(full_html=True, include_plotlyjs='cdn'), mimetype="text/html")
