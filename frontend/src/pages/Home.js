@@ -65,6 +65,7 @@ export default function Home(){
 
                 <input className = "btn btn-primary ms-2" type="submit" value="Submit"/>
             </Form>
+            <a href = "/list" className = "mt-2 mb-2">List of All Taxa</a>
             <HighestRisk/>
         </Container>
     );
