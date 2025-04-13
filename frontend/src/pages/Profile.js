@@ -12,7 +12,7 @@ export default function Profile() {
   return (
     <Container fluid>
       <Header/>
-      <BasicInfo/>
+      <BasicInfo taxonId={taxa} />
       <Map/>
       <Graph/>
       <Summary/>

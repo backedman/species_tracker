@@ -26,6 +26,11 @@ input[type = "submit"]:hover {
   border-color: darkolivegreen;
 }
 
+input[type = "submit"]:active:focus {
+  background-color: rgb(67, 83, 41);
+  border-color: rgb(67, 83, 41);
+}
+
 .navbar {
   background-color: yellowgreen;
 
