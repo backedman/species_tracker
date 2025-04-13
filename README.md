@@ -1,5 +1,5 @@
 # Species Tracker
-Submission for [Bitcamp 2025](https://bitcamp2025.devpost.com/?_gl=1*ispaut*_gcl_au*MTU4MDQ2MzUwNS4xNzQ0NDEzNzc3*_ga*MTE2NDcwNDY0OS4xNjc3MDg3MTYx*_ga_0YHJK3Y10M*MTc0NDUzMTAyNy4xMy4xLjE3NDQ1MzEzNjYuMC4wLjA.)
+Submission for [Bitcamp 2025](https://bitcamp2025.devpost.com/?_gl=1*ispaut*_gcl_au*MTU4MDQ2MzUwNS4xNzQ0NDEzNzc3*_ga*MTE2NDcwNDY0OS4xNjc3MDg3MTYx*_ga_0YHJK3Y10M*MTc0NDUzMTAyNy4xMy4xLjE3NDQ1MzEzNjYuMC4wLjA.)  
 [Link for this project](https://devpost.com/software/wip-y4a1p0)
 
 ## What it does
