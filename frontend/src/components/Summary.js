@@ -1,6 +1,0 @@
-
-export default function Summary(){
-    return (
-        <p>WIP</p>
-    );
-}

@@ -25,10 +25,6 @@ export default function Profile() {
       <section className="my-4">
         <Graph taxonId={taxa} />
       </section>
-
-      <section className="my-4">
-        <Summary />
-      </section>
     </Container>
   );
 }
