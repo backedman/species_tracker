@@ -1,7 +1,7 @@
 import { Container, Form, ListGroup } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import HighestRisk from '../components/HighestRisk';
+import Discovery from '../components/Discovery';
 
 
 
@@ -61,7 +61,8 @@ export default function Home(){
                 )}
                 <input className = "btn btn-primary" type="submit" value="Submit"/>
             </Form>
-            <HighestRisk/>
+            <a href = "/list" className = "mt-2 mb-2">List of All Taxa</a>
+            <Discovery/>
         </Container>
     );
 }
