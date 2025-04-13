@@ -37,7 +37,7 @@ export default function Header() {
       <Container className="justify-content-start ms-3">
         <NavbarBrand><strong>Species Tracker</strong></NavbarBrand>
         <Nav.Link href = "/" className = "ms-3">Home</Nav.Link>
-        <Nav.Link className = "ms-4">All Taxa</Nav.Link>
+        <Nav.Link href = "/list" className = "ms-4">All Taxa</Nav.Link>
         <Form className="d-flex" onSubmit={handleSubmit}>
 
         <div className="d-flex flex-column position-relative" style={{ width: '300px' }}>

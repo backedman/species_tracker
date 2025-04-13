@@ -94,6 +94,11 @@ def info(taxon_id):
     except (KeyError, IndexError):
         return jsonify({'error': 'Info not available for this taxon'}), 404
     
+@app.route('/all_taxa')
+def all_taxa():
+    sorted_taxa = sorted(taxon_dict.items(), key=lambda item: item[1].lower())  # Sort by species name
+    return jsonify([{"name": name, "taxon_id": taxon_id} for taxon_id, name in sorted_taxa])
+    
 
 @app.route('/map/<taxon_id>')
 def map_dist(taxon_id):
